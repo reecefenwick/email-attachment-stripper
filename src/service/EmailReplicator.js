@@ -2,9 +2,10 @@ const MailComposer = require('nodemailer/lib/mail-composer');
 const MailParser = require('mailparser').MailParser;
 
 /**
- * @param recipients - array
+ * @param recipients
  */
 const addressesToStringList = (recipients) => {
+  // TODO RF - Not sure this supports multi recipients
   return recipients.value.map((recipient) => `"${recipient.name}" <${recipient.address}>`);
 };
 
@@ -23,7 +24,8 @@ class EmailReplicator {
       const replicatedEmailOptions = {};
 
       parser.on('headers', headers => {
-        replicatedEmailOptions.headers = headers;
+        console.log(headers);
+        replicatedEmailOptions.headers = headers; // TODO RF - Header values that are arrays are not replicated
         replicatedEmailOptions.from = addressesToStringList(headers.get('from'));
         replicatedEmailOptions.to = addressesToStringList(headers.get('to'));
         replicatedEmailOptions.subject = headers.get('subject');
@@ -43,7 +45,7 @@ class EmailReplicator {
       parser.on('error', reject);
 
       parser.on('end', () => {
-        console.log('Completed building replicatedEmailOptions');
+        console.log('Completed building options for the replicated email without attachments');
         resolve(replicatedEmailOptions);
       });
 
